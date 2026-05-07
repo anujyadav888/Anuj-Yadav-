@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Anuj Yadav | Futuristic UI Developer</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #05070a;
+      --bg-secondary: #0c0f17;
+      --glass-bg: rgba(20, 25, 40, 0.65);
+      --glass-border: rgba(0, 255, 255, 0.25);
+      --neon-cyan: #00f2ff;
+      --neon-purple: #b624ff;
+      --text-light: #eef5ff;
+      --text-dim: #a0b3d9;
+      --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      --transition-smooth: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    body.light {
+      --bg-primary: #f0f4ff;
+      --bg-secondary: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(0, 120, 255, 0.3);
+      --neon-cyan: #2563eb;
+      --neon-purple: #9333ea;
+      --text-light: #0a0f1c;
+      --text-dim: #2d3a5e;
+      --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-light);
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.2s ease;
+      cursor: none;
+    }
+
+    /* custom cursor */
+    .cursor {
+      width: 8px;
+      height: 8px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s;
+    }
+    .cursor-follower {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--neon-purple);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: 0.15s ease-out;
+      backdrop-filter: blur(2px);
+    }
+    /* loader */
+    .loader-wrapper {
+      position: fixed;
+      inset: 0;
+      background: #020408;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s, visibility 0.8s;
+    }
+    .loader-wrapper.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .neon-loader {
+      width: 70px;
+      height: 70px;
+      border: 3px solid transparent;
+      border-top: 3px solid var(--neon-cyan);
+      border-right: 3px solid var(--neon-purple);
+      border-radius: 50%;
+      animation: rotateLoader 0.8s infinite linear;
+      box-shadow: 0 0 15px var(--neon-cyan);
+    }
+    @keyframes rotateLoader { to { transform: rotate(360deg); } }
+
+    /* navbar glass */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      backdrop-filter: blur(14px);
+      background: rgba(5, 7, 10, 0.7);
+      z-index: 1000;
+      padding: 1rem 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--glass-border);
+      transition: 0.3s;
+    }
+    body.light .navbar { background: rgba(240, 244, 255, 0.75); }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 6px var(--neon-cyan);
+    }
+    .theme-toggle {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 8px 12px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--neon-cyan);
+    }
+    .mobile-menu {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: var(--neon-cyan);
+    }
+    @media (max-width: 850px) {
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; width: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); padding: 1.5rem; gap: 1.2rem; text-align: center; }
+      .nav-links.show { display: flex; }
+      .mobile-menu { display: block; }
+    }
+
+    /* common */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    section {
+      padding: 100px 0 80px;
+    }
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      border: 1px solid var(--glass-border);
+      transition: var(--transition-smooth);
+      box-shadow: var(--card-shadow);
+    }
+    .section-title {
+      font-size: 2.8rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      background: linear-gradient(120deg, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    /* hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .hero-content {
+      text-align: center;
+      z-index: 2;
+      width: 100%;
+    }
+    .profile-img {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+      padding: 4px;
+      animation: floatAnim 5s infinite ease;
+    }
+    .profile-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      background: #1a1e2c;
+    }
+    @keyframes floatAnim {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+      100% { transform: translateY(0px); }
+    }
+    .typing-text {
+      font-size: 2.2rem;
+      margin: 1.2rem 0;
+    }
+    #typedRole {
+      color: var(--neon-cyan);
+      border-right: 3px solid var(--neon-purple);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .btn-group {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+    .btn {
+      padding: 12px 32px;
+      background: transparent;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 60px;
+      font-weight: 600;
+      color: var(--neon-cyan);
+      transition: 0.3s;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+    .btn-primary {
+      background: linear-gradient(95deg, var(--neon-cyan), var(--neon-purple));
+      border: none;
+      color: #fff;
+      box-shadow: 0 0 12px var(--neon-cyan);
+    }
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px var(--neon-purple);
+    }
+    /* skills & cards grid */
+    .grid-3, .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .skill-card, .project-card, .service-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      padding: 1.8rem;
+      text-align: center;
+      transition: transform 0.4s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+    }
+    .circular-progress {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 1rem;
+      position: relative;
+    }
+    .progress-circle {
+      transform: rotate(-90deg);
+    }
+    .progress-bg {
+      stroke: rgba(255,255,255,0.1);
+    }
+    .progress-fill-svg {
+      stroke: url(#grad);
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s ease;
+    }
+    .project-img {
+      height: 160px;
+      background: radial-gradient(circle at 30% 20%, var(--neon-cyan), transparent);
+      border-radius: 20px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+    }
+    /* timeline */
+    .timeline {
+      max-width: 800px;
+      margin: auto;
+    }
+    .timeline-item {
+      background: var(--glass-bg);
+      backdrop-filter: blur(8px);
+      padding: 1.2rem 2rem;
+      margin: 1rem 0;
+      border-radius: 30px;
+      border-left: 5px solid var(--neon-cyan);
+      transform: translateX(-30px);
+      opacity: 0;
+      transition: 0.6s;
+    }
+    .timeline-item.reveal {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    /* testimonial slider */
+    .testimonial-slider {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 2rem;
+      padding: 1rem;
+    }
+    .testi-card {
+      min-width: 300px;
+      background: var(--glass-bg);
+      border-radius: 32px;
+      padding: 1.6rem;
+      scroll-snap-align: start;
+    }
+    /* contact */
+    .contact-form input, .contact-form textarea {
+      width: 100%;
+      padding: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      color: var(--text-light);
+      margin-top: 6px;
+    }
+    .floating-group {
+      position: relative;
+      margin: 25px 0;
+    }
+    footer {
+      background: rgba(0,0,0,0.4);
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+    }
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--neon-cyan);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: 0.3s;
+      z-index: 99;
+      box-shadow: 0 0 15px var(--neon-cyan);
+    }
+    canvas#particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .mouse-glow-bg {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0,242,255,0.12) 0%, rgba(182,36,255,0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+    .content {
+      position: relative;
+      z-index: 5;
+    }
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      position: fixed;
+      top: 0;
+      z-index: 1001;
+    }
+    .progress-bar-scroll {
+      height: 4px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+      width: 0%;
+    }
+    @media (max-width: 600px) { .section-title { font-size: 2rem; } .typing-text { font-size: 1.4rem; } }
+  </style>
+</head>
+<body>
+<div class="loader-wrapper" id="loader"><div class="neon-loader"></div></div>
+<div class="progress-container"><div class="progress-bar-scroll" id="scrollProgress"></div></div>
+<div class="mouse-glow-bg" id="mouseGlow"></div>
+<div class="cursor"></div><div class="cursor-follower"></div>
+<canvas id="particles"></canvas>
+
+<nav class="navbar">
+  <div class="logo">ANUJ<span style="color:var(--neon-purple)">.</span>YADAV</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" class="nav-link">Home</a></li><li><a href="#about" class="nav-link">About</a></li><li><a href="#skills" class="nav-link">Skills</a></li>
+    <li><a href="#projects" class="nav-link">Projects</a></li><li><a href="#services" class="nav-link">Services</a></li>
+    <li><a href="#timeline" class="nav-link">Education</a></li><li><a href="#testimonials" class="nav-link">Testimonials</a></li><li><a href="#contact" class="nav-link">Contact</a></li>
+  </ul>
+  <div class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></div>
+  <div class="mobile-menu" id="mobileMenu"><i class="fas fa-bars"></i></div>
+</nav>
+
+<div class="content">
+  <section id="home" class="hero">
+    <div class="hero-content container">
+      <div class="profile-img"><img src="anuj.webp" alt="Anuj Yadav"></div>
+      <h1>Anuj Yadav</h1>
+      <p class="typing-text">I'm a <span id="typedRole"></span></p>
+      <div class="btn-group"><button class="btn btn-primary" id="hireBtn">Hire Me</button><a href="https://drive.google.com/file/d/1_bgqsCg4rHpHj6b38bTCdjJ6yD8dcZiR/view?usp=drivesdk"><button class="btn" id="cvBtn">Download Resume</button></a></div>
+      <div class="socials"><i class="fab fa-github" style="font-size:1.8rem; margin:0 12px; color:var(--neon-cyan)"></i><i class="fab fa-linkedin" style="font-size:1.8rem; margin:0 12px; color:var(--neon-purple)"></i><i class="fab fa-twitter" style="font-size:1.8rem; margin:0 12px; color:var(--neon-cyan)"></i></div>
+    </div>
+  </section>
+
+  <section id="about"><div class="container"><h2 class="section-title">About Me</h2><div class="glass-card" style="padding:2rem;"><p style="font-size:1.2rem">I'm Anuj Yadav, a Web Developer & UI Designer from Prayagraj, Uttar Pradesh. I craft futuristic digital experiences with cutting-edge animations, glassmorphism and 3D elements.</p><div style="display:flex; gap:2rem; flex-wrap:wrap; margin-top:2rem;"><div><i class="fas fa-envelope"></i> anujyadav9278@gmail.com</div><div><i class="fas fa-phone"></i> +91 9129481214</div><div><i class="fas fa-map-pin"></i> Prayagraj, UP</div></div><div class="skill-item mt-4"><div class="skill-name">Web Dev</div><div class="progress-bar"><div class="progress-fill" data-progress="92"></div></div></div><div class="skill-item"><div class="skill-name">UI/UX</div><div class="progress-bar"><div class="progress-fill" data-progress="88"></div></div></div></div></div></section>
+
+  <section id="skills"><div class="container"><h2 class="section-title">Mastery Spectrum</h2><div class="grid-3" id="skillsGrid"></div></div></section>
+  <section id="projects"><div class="container"><h2 class="section-title">Digital Forge</h2><div class="grid-3" id="projectsGrid"></div></div></section>
+  <section id="services"><div class="container"><h2 class="section-title">Stellar Services</h2><div class="services-grid" id="servicesGrid"></div></div></section>
+  <section id="timeline"><div class="container"><h2 class="section-title">Education Orbit</h2><div class="timeline" id="timelineList"></div></div></section>
+  <section id="testimonials"><div class="container"><h2 class="section-title">Client Echoes</h2><div class="testimonial-slider" id="testimonialSlider"></div></div></section>
+  <section id="contact"><div class="container"><h2 class="section-title">Connect Portal</h2><div class="glass-card" style="padding:2rem;"><form id="contactForm" class="contact-form"><div class="floating-group"><input type="text" id="name" required><label>Full Name</label></div><div class="floating-group"><input type="email" id="email" required><label>Email</label></div><div class="floating-group"><textarea rows="4" id="message" required></textarea><label>Message</label></div><button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Message</button><div id="formFeedback" style="margin-top:1rem;"></div></form><div style="margin-top:2rem; text-align:center;"><i class="fab fa-github fa-2x" style="margin:0 10px;"></i><i class="fab fa-linkedin fa-2x" style="margin:0 10px;"></i><i class="fab fa-instagram fa-2x" style="margin:0 10px;"></i><div style="margin-top:1rem; background:#1e2a3a; border-radius:20px; padding:1rem; color:white;">📍 Google Map: Prayagraj, Uttar Pradesh (Demo)</div></div></div></div></section>
+  <footer><p>© 2025 Anuj Yadav — Futuristic Portfolio</p><div><i class="fab fa-github"></i> <i class="fab fa-twitter"></i> <i class="fab fa-dribbble"></i></div></footer>
+  <div class="scroll-top" id="scrollTopBtn"><i class="fas fa-arrow-up"></i></div>
+</div>
+
+<script>
+  // loader
+  window.addEventListener('load',()=>{ document.getElementById('loader').classList.add('hide'); setTimeout(()=>{ if(document.getElementById('loader')) document.getElementById('loader').style.display='none'; },800); });
+  // data
+  const skillNames = ['HTML','CSS','JavaScript','Python','Responsive Design','UI/UX'];
+  const projectsList = ['Nebula Dashboard','Glassmorph Store','AI Motion Lab','Cyber Studio','Quantum Portfolio','Lunar Interface'];
+  const servicesList = ['Web Design','Frontend Dev','Responsive Website','UI/UX Design'];
+  const timelineData = [{year:'2023',title:'10th UP Board'},{year:'2025',title:'12th UP Board'},{year:'Present',title:'B.A Pursuing'}];
+  const testimonialsData = [{name:'Rajesh K.',text:'Absolutely futuristic design and smooth interactions!',rate:5},{name:'Neha V.',text:'3D cards and glassmorphism are next-level',rate:5},{name:'Amit S.',text:'Best portfolio I have ever seen, great work',rate:5}];
+
+  // generate skills with circular svg
+  function buildSkills() {
+    let html = '';
+    skillNames.forEach(s => {
+      let percent = s==='HTML'?95:s==='CSS'?90:s==='JavaScript'?88:s==='Python'?85:s==='Responsive Design'?92:86;
+      html += `<div class="skill-card"><div class="circular-progress"><svg viewBox="0 0 100 100" class="progress-circle"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffffff20" stroke-width="8"/><circle class="progress-fill-svg" cx="50" cy="50" r="45" fill="none" stroke="url(#gradSkill)" stroke-width="8" stroke-dasharray="${2*Math.PI*45}" stroke-dashoffset="${2*Math.PI*45*(1-percent/100)}"/></svg><div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.4rem; font-weight:bold;">${percent}%</div></div><h3>${s}</h3></div>`;
+    });
+    document.getElementById('skillsGrid').innerHTML = html;
+    const svgDefs = `<svg style="display:none;"><defs><linearGradient id="gradSkill" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="var(--neon-cyan)"/><stop offset="100%" stop-color="var(--neon-purple)"/></linearGradient></defs></svg>`;
+    document.body.insertAdjacentHTML('beforeend', svgDefs);
+  }
+  function buildProjects() { let html=''; projectsList.forEach(p=>{ html+=`<div class="project-card"><div class="project-img"><i class="fas fa-cubes fa-3x"></i></div><h3>${p}</h3><p>Immersive UI with glassmorphism and 3D hover.</p><div><button class="btn" style="padding:6px 18px; margin:5px;">Live</button><button class="btn">GitHub</button></div></div>`; }); document.getElementById('projectsGrid').innerHTML=html; }
+  function buildServices() { let html=''; servicesList.forEach(s=>{ html+=`<div class="service-card"><i class="fas fa-code-branch fa-3x" style="color:var(--neon-cyan)"></i><h3>${s}</h3><p>Cutting-edge futuristic development.</p></div>`; }); document.getElementById('servicesGrid').innerHTML=html; }
+  function buildTimeline() { let html=''; timelineData.forEach(t=>{ html+=`<div class="timeline-item"><div style="display:flex; gap:1rem;"><div style="width:12px;height:12px;border-radius:50%;background:var(--neon-cyan); box-shadow:0 0 8px cyan; margin-top:5px;"></div><div><strong>${t.year}</strong> — ${t.title}</div></div></div>`; }); document.getElementById('timelineList').innerHTML=html; }
+  function buildTestimonials() { let html=''; testimonialsData.forEach(t=>{ html+=`<div class="testi-card"><div><i class="fas fa-star" style="color:#FFD700"></i><i class="fas fa-star" style="color:#FFD700"></i><i class="fas fa-star" style="color:#FFD700"></i><i class="fas fa-star" style="color:#FFD700"></i><i class="fas fa-star" style="color:#FFD700"></i></div><p>"${t.text}"</p><h4>- ${t.name}</h4></div>`; }); document.getElementById('testimonialSlider').innerHTML=html; }
+  
+  buildSkills(); buildProjects(); buildServices(); buildTimeline(); buildTestimonials();
+
+  // typing animation
+  const roles = ['Web Developer', 'Frontend Designer', 'Creative Coder'];
+  let roleIndex=0, charIdx=0, isDeleting=false;
+  const typedSpan = document.getElementById('typedRole');
+  function typeEffect() { let current = roles[roleIndex]; if(isDeleting) typedSpan.innerText = current.substring(0, charIdx--); else typedSpan.innerText = current.substring(0, charIdx++); if(!isDeleting && charIdx===current.length){ isDeleting=true; setTimeout(typeEffect,1500); return; } else if(isDeleting && charIdx===0){ isDeleting=false; roleIndex=(roleIndex+1)%roles.length; setTimeout(typeEffect,400); return; } setTimeout(typeEffect, isDeleting?50:120); } typeEffect();
+
+  // theme
+  const themeBtn = document.getElementById('themeToggle');
+  themeBtn.addEventListener('click',()=>{ document.body.classList.toggle('light'); const icon = themeBtn.querySelector('i'); if(document.body.classList.contains('light')) icon.classList.replace('fa-moon','fa-sun'); else icon.classList.replace('fa-sun','fa-moon'); });
+
+  // mobile menu
+  const mobileBtn = document.getElementById('mobileMenu'), navLinks = document.getElementById('navLinks');
+  mobileBtn.addEventListener('click',()=>{ navLinks.classList.toggle('show'); });
+  document.querySelectorAll('.nav-link').forEach(link=>{ link.addEventListener('click',()=>{ navLinks.classList.remove('show'); }); });
+
+  // smooth scroll + active navbar
+  const sectionsAll = document.querySelectorAll('section');
+  window.addEventListener('scroll',()=>{ let y = window.scrollY+150; sectionsAll.forEach(sec=>{ if(sec.offsetTop <= y && sec.offsetTop+sec.offsetHeight > y){ let id = sec.getAttribute('id'); document.querySelectorAll('.nav-link').forEach(link=>{ link.classList.remove('active'); if(link.getAttribute('href')===`#${id}`) link.classList.add('active'); }); } }); });
+  document.querySelectorAll('.nav-link').forEach(anchor=>{ anchor.addEventListener('click',function(e){ e.preventDefault(); const target = document.querySelector(this.getAttribute('href')); if(target) target.scrollIntoView({behavior:'smooth'}); }); });
+  document.getElementById('scrollTopBtn').addEventListener('click',()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
+  window.addEventListener('scroll',()=>{ let btn = document.getElementById('scrollTopBtn'); if(btn) btn.style.opacity = window.scrollY>400?'1':'0'; });
+
+  // scroll reveal & progress fill animations
+  const progressFills = document.querySelectorAll('.progress-fill');
+  function revealAnim() {
+    document.querySelectorAll('.timeline-item, .project-card, .skill-card, .service-card').forEach(el=>{ if(el.getBoundingClientRect().top < window.innerHeight-100) el.classList.add('reveal'); });
+    progressFills.forEach(bar=>{ if(bar.getBoundingClientRect().top < window.innerHeight-80){ let w = bar.getAttribute('data-progress')||80; bar.style.width = w+'%'; } });
+  }
+  window.addEventListener('scroll', revealAnim);
+  setTimeout(revealAnim, 300);
+
+  // custom cursor + 3D tilt
+  const cursor = document.querySelector('.cursor'), follower = document.querySelector('.cursor-follower');
+  document.addEventListener('mousemove',(e)=>{ cursor.style.transform = `translate(${e.clientX-4}px, ${e.clientY-4}px)`; follower.style.transform = `translate(${e.clientX-20}px, ${e.clientY-20}px)`; document.getElementById('mouseGlow').style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; });
+  document.querySelectorAll('.project-card, .skill-card, .service-card').forEach(card=>{ card.addEventListener('mousemove',(e)=>{ let rect = card.getBoundingClientRect(); let x = e.clientX - rect.left; let y = e.clientY - rect.top; let xRot = (y/rect.height-0.5)*12; let yRot = (x/rect.width-0.5)*12; card.style.transform = `perspective(800px) rotateX(${xRot}deg) rotateY(${yRot}deg) translateY(-5px)`; }); card.addEventListener('mouseleave',()=>{ card.style.transform = ''; }); });
+
+  // particles background
+  const canvas = document.getElementById('particles'), ctx = canvas.getContext('2d');
+  let particles = [];
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resizeCanvas); resizeCanvas();
+  for(let i=0;i<140;i++){ particles.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, radius:Math.random()*2+1, dx:(Math.random()-0.5)*0.6, dy:(Math.random()-0.5)*0.5, color:`rgba(0, ${180+Math.random()*75}, 255, 0.4)` }); }
+  function drawParticles(){ if(!ctx) return; ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ p.x+=p.dx; p.y+=p.dy; if(p.x<0||p.x>canvas.width) p.dx*=-1; if(p.y<0||p.y>canvas.height) p.dy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fillStyle=p.color; ctx.fill(); }); requestAnimationFrame(drawParticles); } drawParticles();
+
+  // form validation + floating labels
+  const contactForm = document.getElementById('contactForm'), feedback = document.getElementById('formFeedback');
+  contactForm.addEventListener('submit',(e)=>{ e.preventDefault(); let name = document.getElementById('name').value.trim(); let email = document.getElementById('email').value.trim(); let message = document.getElementById('message').value.trim(); if(!name || !email || !message) feedback.innerHTML = '<span style="color:#ff5555">❗ All fields required</span>'; else if(!email.includes('@') || !email.includes('.')) feedback.innerHTML = '<span style="color:#ff5555">❗ Valid email needed</span>'; else { feedback.innerHTML = '<span style="color:#00ffaa">🚀 Message sent successfully! (demo)</span>'; contactForm.reset(); document.querySelectorAll('.floating-group input, .floating-group textarea').forEach(f=>{ f.parentElement.classList.remove('focused'); }); } setTimeout(()=>feedback.innerHTML='',3000); });
+  document.querySelectorAll('.floating-group input, .floating-group textarea').forEach(field=>{ field.addEventListener('focus',()=>field.parentElement.classList.add('focused')); field.addEventListener('blur',()=>{ if(!field.value) field.parentElement.classList.remove('focused'); }); if(field.value) field.parentElement.classList.add('focused'); });
+  document.getElementById('hireBtn').addEventListener('click',()=>{ document.getElementById('contact').scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('cvBtn').addEventListener('click',()=>{ alert("Resume download simulation: Anuj_Yadav_Resume.pdf"); });
+  // auto slider
+  setInterval(()=>{ let sliderDiv = document.getElementById('testimonialSlider'); if(sliderDiv){ sliderDiv.scrollBy({left:330,behavior:'smooth'}); if(sliderDiv.scrollLeft + sliderDiv.clientWidth >= sliderDiv.scrollWidth) sliderDiv.scrollTo({left:0,behavior:'smooth'}); } }, 4200);
+  // scroll progress bar
+  window.addEventListener('scroll',()=>{ let winScroll = document.documentElement.scrollTop, height = document.documentElement.scrollHeight - window.innerHeight; let scrolled = (winScroll/height)*100; document.getElementById('scrollProgress').style.width = scrolled+'%'; });
+</script>
+<style>
+  .skill-name { margin-top: 12px; font-weight: 600; }
+  .progress-bar { background: rgba(255,255,255,0.2); border-radius: 12px; height: 8px; margin: 8px 0; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); border-radius: 12px; transition: width 1.2s ease; }
+  .floating-group label { position: absolute; left: 18px; top: 14px; color: var(--text-dim); transition: 0.2s; pointer-events: none; }
+  .floating-group input:focus~label, .floating-group textarea:focus~label, .floating-group.focused label { top: -12px; font-size: 12px; background: var(--bg-primary); padding: 0 6px; color: var(--neon-cyan); }
+  .timeline-item.reveal, .project-card.reveal, .skill-card.reveal, .service-card.reveal { opacity: 1; transform: translateY(0px) !important; }
+  .project-card, .skill-card, .service-card { opacity: 0; transform: translateY(30px); transition: 0.5s; }
+  .mt-4 { margin-top: 1.5rem; }
+  body.light .progress-bar { background: #ccc; }
+</style>
+</body>
+</html>
